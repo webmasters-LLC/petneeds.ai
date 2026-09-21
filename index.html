@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PetNeeds.ai — Smarter Care for Happier Pets</title>
+<meta name="description" content="A family-friendly, collaborative pet care tracker and educational platform.">
+<style>
+:root{--primary:#0d7377;--primary-light:#4ecdc4;--dark:#0a1929;--text:#e0e0e0;--text-muted:#8899aa;--card-bg:rgba(255,255,255,.05);--card-border:rgba(255,255,255,.1);--radius:16px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--dark);color:var(--text);line-height:1.6;overflow-x:hidden}
+a{color:var(--primary-light);text-decoration:none}a:hover{text-decoration:underline}
+nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(10,25,41,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--card-border);padding:.8rem 2rem;display:flex;justify-content:space-between;align-items:center}
+nav .logo{font-size:1.3rem;font-weight:700;color:var(--primary-light)}
+nav .links{display:flex;gap:1.5rem}nav .links a{color:var(--text-muted);font-size:.95rem;transition:color .3s}nav .links a:hover{color:var(--primary-light);text-decoration:none}
+@media(max-width:768px){nav .links{display:none}}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;background:linear-gradient(135deg,#0a1929 0%,#1a3a5c 50%,#0d7377 100%);position:relative}
+.hero-content{position:relative;z-index:1}
+.badge{display:inline-block;padding:.4rem 1.2rem;border:1px solid var(--primary-light);border-radius:999px;font-size:.85rem;color:var(--primary-light);margin-bottom:1.5rem;letter-spacing:1px}
+.hero h1{font-size:clamp(2.5rem,6vw,4.5rem);margin-bottom:1rem;background:linear-gradient(90deg,#4ecdc4,#44a08d);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:clamp(1.1rem,2.5vw,1.4rem);max-width:650px;margin-bottom:2rem;color:#b8d4e3}
+.cta{display:inline-block;padding:1rem 2.5rem;background:linear-gradient(90deg,#4ecdc4,#44a08d);color:var(--dark);font-weight:700;border-radius:12px;text-decoration:none;transition:transform .3s,box-shadow .3s}
+.cta:hover{transform:scale(1.05);box-shadow:0 10px 30px rgba(78,205,196,.4);text-decoration:none}
+section{padding:4rem 2rem;max-width:1200px;margin:0 auto}
+.section-title{text-align:center;font-size:clamp(1.8rem,4vw,2.5rem);margin-bottom:1rem;color:var(--text)}
+.section-subtitle{text-align:center;color:var(--text-muted);max-width:600px;margin:0 auto 3rem;font-size:1.1rem}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
+.feature-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:2rem;transition:transform .3s,box-shadow .3s}
+.feature-card:hover{transform:translateY(-5px);box-shadow:0 10px 40px rgba(78,205,196,.15)}
+.feature-card .icon{font-size:2.5rem;margin-bottom:1rem}.feature-card h3{color:var(--primary-light);margin-bottom:.5rem;font-size:1.2rem}.feature-card p{color:var(--text-muted);font-size:.95rem}
+.library-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.library-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:1.5rem;text-align:center;transition:transform .3s}
+.library-card:hover{transform:scale(1.03)}.library-card .emoji{font-size:2rem;margin-bottom:.5rem}.library-card h4{color:var(--primary-light);font-size:1rem;margin-bottom:.3rem}.library-card p{color:var(--text-muted);font-size:.85rem}
+.disclaimer{background:rgba(255,193,7,.08);border:1px solid rgba(255,193,7,.3);border-radius:var(--radius);padding:2rem;margin:2rem auto;max-width:800px}
+.disclaimer h3{color:#ffc107;margin-bottom:.5rem;font-size:1.1rem}.disclaimer p{color:var(--text-muted);font-size:.95rem}
+footer{text-align:center;padding:3rem 2rem;color:var(--text-muted);font-size:.85rem;border-top:1px solid var(--card-border)}footer a{color:var(--primary-light)}
+</style>
+</head>
+<body>
+<nav><div class="logo">🐾 PetNeeds.ai</div><div class="links"><a href="#features">Features</a><a href="#library">Library</a><a href="#disclaimer">Disclaimer</a><a href="https://github.com/webmasters-LLC/petneeds.ai">GitHub</a></div></nav>
+<div class="hero"><div class="hero-content"><span class="badge">FAMILY-FRIENDLY PET CARE PLATFORM</span><h1>PetNeeds.ai</h1><p>Smarter care for happier pets. A collaborative pet care tracker and educational platform designed to help your household keep pets happy and healthy.</p><a href="#features" class="cta">Explore Features</a></div></div>
+<section id="features"><h2 class="section-title">Platform Features</h2><p class="section-subtitle">Everything your family needs to coordinate pet care in one place.</p><div class="features-grid">
+<div class="feature-card"><div class="icon">🏠</div><h3>Family Dashboard</h3><p>Coordinate care assignments, daily feedings, medication times, and grooming routines across multiple household members.</p></div>
+<div class="feature-card"><div class="icon">📋</div><h3>Routine &amp; Health Logging</h3><p>Track weight, dietary habits, and physical updates to build a clear history for your local veterinarian.</p></div>
+<div class="feature-card"><div class="icon">📚</div><h3>Educational Library</h3><p>Access comprehensive, curated pet care guides for dogs, cats, birds, fish, reptiles, small pets, and more.</p></div>
+<div class="feature-card"><div class="icon">📸</div><h3>Media Gateway</h3><p>Securely
