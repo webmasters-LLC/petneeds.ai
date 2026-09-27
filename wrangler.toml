@@ -1,1 +1,13 @@
+name = "petneeds-avatar-api"
+main = "src/index.js"
+compatibility_date = "2026-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Workers AI binding — no API key needed, included on free plan
+[ai]
+binding = "AI"
+
+# Custom domains (already configured in dashboard)
+# petneeds.ai
+# www.petneeds.ai
 
