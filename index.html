@@ -1,1 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>petneeds.ai — Elaina AI Veterinarian</title>
+<style>
+:root{--teal:#0d9488;--teal-d:#0f766e;--teal-l:#5eead4;--bg:#f0fdfa;--card:#fff;--text:#1c1917;--muted:#78716c;--border:#e7e5e4;--amber:#f59e0b;--red:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;justify-content:space-between;align-items:center;z-index:10}
+.logo{font-size:1.3rem;font-weight:800;color:var(--teal-d);display:flex;align-items:center;gap:.5rem}
+.logo svg{width:28px;height:28px;flex-shrink:0}
+.model-pick{background:#fff;border:1px solid var(--border);border-radius:.5rem;padding:.4rem .6rem;font-size:.8rem;color:var(--muted);cursor:pointer}
+.model-pick:focus{outline:none;border-color:var(--teal)}
+.main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;gap:1rem;position:relative}
+.avatar-stage{display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.avatar-ring{width:200px;height:200px;border-radius:50%;background:conic-gradient(from 0deg,var(--teal-l),var(--teal),var(--teal-d),var(--teal-l));display:flex;align-items:center;justify-content:center;position:relative;animation:spinSlow 20s linear infinite}
+.avatar-ring.idle{animation:none;opacity:.6}
+.avatar-ring.thinking{animation:spinSlow 2s linear infinite}
+.avatar-ring.speaking{animation:spinSlow 4s linear infinite;box-shadow:0 0 40px rgba(13,148,136,.3)}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+.avatar-inner{width:180px;height:180px;border-radius:50%;background:linear-gradient(135deg,#fef3c7,#fde68a);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.avatar-svg{width:160px;height:160px;position:relative;z-index:2}
+.avatar-pulse{position:absolute;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle,rgba(13,148,136,.15),transparent 70%);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.1);opacity:.8}}
+.avatar-name{font-size:1.1rem;font-weight:700;color:var(--teal-d);margin-top:.25rem}
+.avatar-title{font-size:.85rem;color:var(--muted)}
+.status-bar{font-size:.85rem;color:var(--muted);min-height:1.2rem;text-align:center}
+.status-bar.listening{color:var(--red)}
+.status-bar.thinking{color:var(--amber)}
+.status-bar.speaking{color:var(--teal)}
+.chat-log{width:100%;max-width:500px;max-height:200px;overflow-y:auto;padding:.5rem;display:flex;flex-direction:column;gap:.5rem}
+.chat-log:empty{display:none}
+.msg{max-width:85%;padding:.6rem 1rem;border-radius:1rem;font-size:.9rem;line-height:1.5}
+.msg.user{align-self:flex-end;background:var(--teal);color:#fff;border-radius:1rem 1rem .25rem 1rem}
+.msg.ai{align-self:flex-start;background:#fff;border:1px solid var(--border);border-radius:1rem 1rem 1rem .25rem;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.controls{display:flex;gap:.75rem;align-items:center}
+.mic-btn{width:64px;height:64px;border-radius:50%;border:none;background:var(--teal);color:#fff;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;box-shadow:0 4px 15px rgba(13,148,136,.3)}
+.mic-btn:hover{transform:scale(1.1);background:var(--teal-d)}
+.mic-btn.recording{background:var(--red);animation:recPulse 1s ease-in-out infinite}
+@keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 15px rgba(239,68,68,0)}}
+.text-input{flex:1;max-width:300px;padding:.7rem 1rem;border:2px solid var(--border);border-radius:2rem;font-size:.95rem;outline:none;background:#fff;transition:border-color .3s}
+.text-input:focus{border-color:var(--teal)}
+.send-btn{padding:.7rem 1.25rem;background:var(--teal);color:#fff;border:none;border-radius:2rem;font-weight:600;cursor:pointer;font-size:.9rem;transition:all .25s}
+.send-btn:hover{background:var(--teal-d)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.disclaimer{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-top:1px solid var(--border);padding:.5rem;text-align:center;font-size:.7rem;color:var(--muted);z-index:10}
+.suggest-row{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;max-width:500px}
+.suggest-btn{padding:.4rem .9rem;background:#fff;border:1px solid var(--border);border-radius:2rem;font-size:.8rem;color:var(--teal-d);cursor:pointer;transition:all .2s}
+.suggest-btn:hover{background:var(--teal);color:#fff;border-color:var(--teal)}
+@media(max-width:600px){.avatar-ring{width:160px;height:160px}.avatar-inner{width:140px;height:140px}.avatar-svg{width:120px;height:120px}.chat-log{max-height:150px}}
+</style>
+</head>
+<body>
+<header>
+<div class="logo"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="15" fill="#0d9488"/><path d="M10 12c0-3 2.5-5 6-5s6 2 6 5v4c0 3-2.5 5-6 5s-6-2-6-5v-4z" fill="#fde68a" stroke="#0f766e" stroke-width="1.5"/><circle cx="13" cy="14" r="1.5" fill="#333"/><circle cx="19" cy="14" r="1.5" fill="#333"/><path d="M12 18c1 1.5 2.5 2 4 2s3-.5 4-2" stroke="#333" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M8 16c0 0-2 0-2 3v3" stroke="#0f766e" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="6" cy="23" r="2" fill="#0d9488" stroke="#0f766e" stroke-width="1"/></svg> petneeds.ai</div>
+<select class="model-pick" id="modelPick"></select>
+</header>
+<div class="main">
+<div class="avatar-stage">
+<div class="avatar-ring idle" id="avatarRing">
+<div class="avatar-inner">
+<div class="avatar-pulse"></div>
+<svg class="avatar-svg" viewBox="0 0 200 200" id="avatarSvg">
+<defs><radialGradient id="skinG" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffe4cc"/><stop offset="100%" stop-color="#f5c89a"/></radialGradient></defs>
+<circle cx="100" cy="100" r="95" fill="url(#skinG)"/>
+<path d="M28,95 Q28,35 100,28 Q172,35 172,95 Q172,150 165,170 L35,170 Q28,150 28,95Z" fill="#4a2c1e"/>
+<ellipse cx="100" cy="108" rx="52" ry="58" fill="url(#skinG)"/>
+<path d="M48,85 Q52,48 100,42 Q148,48 152,85 Q138,68 100,63 Q62,68 48,85Z" fill="#4a2c1e"/>
+<path d="M48,85 Q40,95 42,110 Q44,100 48,95Z" fill="#3a2218"/>
+<path d="M152,85 Q160,95 158,110 Q156,100 152,95Z" fill="#3a2218"/>
+<ellipse cx="80" cy="103" rx="4.5" ry="5.5" fill="#2d2d2d" id="eyeL"/>
+<ellipse cx="120" cy="103" rx="4.5" ry="5.5" fill="#2d2d2d" id="eyeR"/>
+<circle cx="78" cy="101" r="1.5" fill="#fff"/>
+<circle cx="118" cy="101" r="1.5" fill="#fff"/>
+<path d="M72,90 Q80,87 88,90" stroke="#4a2c1e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<path d="M112,90 Q120,87 128,90" stroke="#4a2c1e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<path d="M100,112 L96,124 Q100,126 104,124" stroke="#e0a878" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path id="mouth" d="M84,132 Q100,144 116,132" stroke="#c4756a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<path d="M65,160 Q65,178 100,178 Q135,178 135,160" stroke="#0d9488" stroke-width="4" fill="none" stroke-linecap="round"/>
+<circle cx="135" cy="160" r="7" fill="#0d9488" stroke="#0f766e" stroke-width="2"/>
+<rect x="84" y="32" width="32" height="18" rx="3" fill="#fff" stroke="#0d9488" stroke-width="1.5"/>
+<line x1="100" y1="35" x2="100" y2="47" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="92" y1="41" x2="108" y2="41" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="70" cy="135" r="3" fill="#fbbf24" opacity="0.7" id="blushL"/>
+<circle cx="130" cy="135" r="3" fill="#fbbf24" opacity="0.7" id="blushR"/>
+</svg>
+</div>
+</div>
+<div class="avatar-name">Elaina</div>
+<div class="avatar-title">AI Veterinarian</div>
+</div>
+<div class="status-bar" id="statusBar">Tap the microphone and ask about your pet</div>
+<div class="suggest-row" id="suggestRow">
+<button class="suggest-btn" onclick="quickAsk('My dog keeps scratching his ear, what should I do?')">Dog scratching ear</button>
+<button class="suggest-btn" onclick="quickAsk('What should I feed my new kitten?')">Kitten diet</button>
+<button class="suggest-btn" onclick="quickAsk('My goldfish is floating sideways, is it sick?')">Sick goldfish</button>
+</div>
+<div class="chat-log" id="chatLog"></div>
+<div class="controls">
+<button class="mic-btn" id="micBtn" onclick="toggleMic()">&#127908;</button>
+<input type="text" class="text-input" id="textInput" placeholder="Type your question..." onkeydown="if(event.key==='Enter')sendText()">
+<button class="send-btn" id="sendBtn" onclick="sendText()">Send</button>
+</div>
+</div>
+<div class="disclaimer">For educational purposes only. Always consult a licensed veterinarian for medical emergencies. &copy; 2026 petneeds.ai</div>
+<script>
+var API_BASE="https://omniroute-edge-gateway.wholelychit.workers.dev";
+var chatHistory=[];
+var chatBusy=false;
+var isRecording=false;
+var recognition=null;
+var synth=window.speechSynthesis||null;
+var voices=[];
+var selectedVoice=null;
+var avatarRing=document.getElementById("avatarRing");
+var statusBar=document.getElementById("statusBar");
+var micBtn=document.getElementById("micBtn");
+function setStatus(text,cls){
+statusBar.innerText=text;
+statusBar.className="status-bar "+(cls||"");
 }
+function setAvatarState(state){
+avatarRing.className="avatar-ring "+state;
+var mouth=document.getElementById("mouth");
+var eyeL=document.getElementById("eyeL");
+var eyeR=document.getElementById("eyeR");
+if(state==="thinking"){
+mouth.setAttribute("d","M90,134 Q100,138 110,134");
+eyeL.setAttribute("ry","2");
+eyeR.setAttribute("ry","2");
+}else if(state==="speaking"){
+mouth.setAttribute("d","M90,130 Q100,142 110,130 Q100,136 90,130");
+eyeL.setAttribute("ry","5.5");
+eyeR.setAttribute("ry","5.5");
+}else if(state==="listening"){
+mouth.setAttribute("d","M88,132 Q100,136 112,132");
+eyeL.setAttribute("ry","5.5");
+eyeR.setAttribute("ry","5.5");
+}else{
+mouth.setAttribute("d","M84,132 Q100,144 116,132");
+eyeL.setAttribute("ry","5.5");
+eyeR.setAttribute("ry","5.5");
+}
+}
+async function loadModels(){
+try{
+var r=await fetch(API_BASE+"/v1/models");
+var d=await r.json();
+var sel=document.getElementById("modelPick");
+var added=0;
+for(var i=0;i<d.data.length;i++){
+var m=d.data[i];
+if(m.available){
+var o=document.createElement("option");
+o.value=m.id;
+o.innerText=m.label;
+sel.appendChild(o);
+added++;
+}
+}
+if(added===0){
+var o2=document.createElement("option");
+o2.value="gpt-oss-120b";
+o2.innerText="GPT-OSS 120B";
+sel.appendChild(o2);
+}
+}catch(e){
+var sel2=document.getElementById("modelPick");
+var o3=document.createElement("option");
+o3.value="gpt-oss-120b";
+o3.innerText="GPT-OSS 120B";
+sel2.appendChild(o3);
+}
+}
+loadModels();
+function loadVoices(){
+if(synth){
+voices=synth.getVoices();
+for(var i=0;i<voices.length;i++){
+if(voices[i].name.indexOf("Google US English")>=0||voices[i].name.indexOf("Samantha")>=0||voices[i].name.indexOf("Female")>=0){
+selectedVoice=voices[i];
+break;
+}
+}
+if(!selectedVoice&&voices.length>0)selectedVoice=voices[0];
+}
+}
+if(synth){
+loadVoices();
+if(synth.onvoiceschanged!==undefined)synth.onvoiceschanged=loadVoices;
+}
+function addMsg(cls,text){
+var log=document.getElementById("chatLog");
+var d=document.createElement("div");
+d.className="msg "+cls;
+d.innerText=text;
+log.appendChild(d);
+log.scrollTop=log.scrollHeight;
+return d;
+}
+function speak(text){
+if(!synth){return;}
+synth.cancel();
+var u=new SpeechSynthesisUtterance(text);
+u.rate=1;
+u.pitch=1.1;
+u.volume=1;
+if(selectedVoice)u.voice=selectedVoice;
+u.onstart=function(){setAvatarState("speaking");setStatus("Elaina is speaking...","speaking");};
+u.onend=function(){setAvatarState("idle");setStatus("Tap the microphone and ask about your pet","");};
+u.onerror=function(){setAvatarState("idle");setStatus("Tap the microphone and ask about your pet","");};
+synth.speak(u);
+}
+async function sendToAI(text){
+if(chatBusy)return;
+chatBusy=true;
+document.getElementById("sendBtn").disabled=true;
+addMsg("user",text);
+chatHistory.push({role:"user",content:text});
+setAvatarState("thinking");
+setStatus("Elaina is thinking...","thinking");
+try{
+var model=document.getElementById("modelPick").value;
+var r=await fetch(API_BASE+"/v1/chat/completions",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({model:model,messages:chatHistory.slice(-10)})
+});
+var d=await r.json();
+if(d.error){
+addMsg("ai","Sorry, I had trouble: "+d.error);
+setStatus("Error occurred","");
+setAvatarState("idle");
+}else{
+var reply=d.choices&&d.choices[0]?d.choices[0].message.content:"I did not catch that.";
+addMsg("ai",reply);
+chatHistory.push({role:"assistant",content:reply});
+speak(reply);
+}
+}catch(e){
+addMsg("ai","Connection error. Please try again.");
+setStatus("Connection error","");
+setAvatarState("idle");
+}
+chatBusy=false;
+document.getElementById("sendBtn").disabled=false;
+}
+function sendText(){
+var inp=document.getElementById("textInput");
+var text=inp.value.trim();
+if(!text)return;
+inp.value="";
+sendToAI(text);
+}
+function quickAsk(text){
+document.getElementById("textInput").value=text;
+sendText();
+}
+function toggleMic(){
+if(isRecording){
+stopRecording();
+}else{
+startRecording();
+}
+}
+function startRecording(){
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(!SR){
+setStatus("Voice not supported in this browser. Type instead.","");
+return;
+}
+recognition=new SR();
+recognition.continuous=false;
+recognition.interimResults=false;
+recognition.lang="en-US";
+recognition.onstart=function(){
+isRecording=true;
+micBtn.classList.add("recording");
+setAvatarState("listening");
+setStatus("Listening... speak now","listening");
+};
+recognition.onresult=function(event){
+var text=event.results[0][0].transcript;
+sendToAI(text);
+};
+recognition.onerror=function(event){
+setStatus("Could not hear you. Try again or type.","");
+setAvatarState("idle");
+};
+recognition.onend=function(){
+isRecording=false;
+micBtn.classList.remove("recording");
+if(statusBar.className.indexOf("listening")>=0){
+setAvatarState("idle");
+setStatus("Tap the microphone and ask about your pet","");
+}
+};
+recognition.start();
+}
+function stopRecording(){
+if(recognition)recognition.stop();
+isRecording=false;
+micBtn.classList.remove("recording");
+setAvatarState("idle");
+setStatus("Tap the microphone and ask about your pet","");
+}
+</script>
+</body>
+</html>
+
